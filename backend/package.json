@@ -1,0 +1,14 @@
+{
+  "name": "easyroad-backend",
+  "version": "1.0.0",
+  "description": "Backend API for EasyROAD Carpooling Application",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "NODE_ENV=development nodemon server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["carpool", "api", "express", "mongodb"],
+  "author": "",
+  "license": "ISC"
+}
