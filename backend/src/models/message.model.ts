@@ -1,23 +1,23 @@
-const mongoose = require('mongoose');
+import mongoose, { Schema } from 'mongoose';
+import { IMessage } from '../interfaces/message.interface';
 
-const messageSchema = new mongoose.Schema({
+const messageSchema = new Schema<IMessage>({
   conversation: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'Conversation',
     required: true
   },
   sender: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'User',
     required: true
   },
   recipient: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'User',
     required: true
   },
   
-  // Message content
   content: {
     type: String,
     required: true,
@@ -29,7 +29,6 @@ const messageSchema = new mongoose.Schema({
     default: 'text'
   },
   
-  // Additional data for different message types
   attachments: [{
     type: {
       type: String,
@@ -47,11 +46,10 @@ const messageSchema = new mongoose.Schema({
   },
   
   bookingReference: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'Booking'
   },
   
-  // Message status
   status: {
     type: String,
     enum: ['sent', 'delivered', 'read'],
@@ -60,20 +58,17 @@ const messageSchema = new mongoose.Schema({
   deliveredAt: Date,
   readAt: Date,
   
-  // Soft delete
   isDeleted: {
     type: Boolean,
     default: false
   },
   deletedAt: Date
-  
 }, {
   timestamps: true
 });
 
-// Indexes
 messageSchema.index({ conversation: 1, createdAt: -1 });
 messageSchema.index({ sender: 1, recipient: 1 });
 messageSchema.index({ status: 1 });
 
-module.exports = mongoose.model('Message', messageSchema);
+export default mongoose.model<IMessage>('Message', messageSchema);

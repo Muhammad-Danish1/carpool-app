@@ -1,23 +1,23 @@
-const mongoose = require('mongoose');
+import mongoose, { Schema } from 'mongoose';
+import { IBooking } from '../interfaces/booking.interface';
 
-const bookingSchema = new mongoose.Schema({
+const bookingSchema = new Schema<IBooking>({
   trip: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'Trip',
     required: true
   },
   passenger: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'User',
     required: true
   },
   driver: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'User',
     required: true
   },
   
-  // Booking details
   bookingNumber: {
     type: String,
     unique: true,
@@ -37,7 +37,6 @@ const bookingSchema = new mongoose.Schema({
     min: 1
   },
   
-  // Pricing
   pricePerSeat: {
     type: Number,
     required: true
@@ -67,7 +66,6 @@ const bookingSchema = new mongoose.Schema({
     default: 'USD'
   },
   
-  // Payment
   paymentStatus: {
     type: String,
     enum: ['pending', 'paid', 'partially_paid', 'refunded', 'failed'],
@@ -79,11 +77,10 @@ const bookingSchema = new mongoose.Schema({
     default: 'card'
   },
   payment: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'Payment'
   },
   
-  // Pickup/Dropoff
   pickupLocation: {
     address: String,
     coordinates: {
@@ -101,19 +98,17 @@ const bookingSchema = new mongoose.Schema({
     notes: String
   },
   
-  // Status
   status: {
     type: String,
     enum: ['pending', 'confirmed', 'in_progress', 'completed', 'cancelled', 'no_show'],
     default: 'pending'
   },
   confirmationCode: String,
-  qrCode: String, // QR code for ticket validation
+  qrCode: String,
   
-  // Cancellation
   cancellationReason: String,
   cancelledBy: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'User'
   },
   cancelledAt: Date,
@@ -123,38 +118,32 @@ const bookingSchema = new mongoose.Schema({
     enum: ['none', 'pending', 'processed', 'failed']
   },
   
-  // Special requests
   specialRequests: String,
   luggageCount: {
     type: Number,
     default: 1
   },
   
-  // Ratings and reviews
   isRated: {
     type: Boolean,
     default: false
   },
   rating: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'Rating'
   },
   
-  // Timestamps
   confirmedAt: Date,
   completedAt: Date
-  
 }, {
   timestamps: true
 });
 
-// Indexes
 bookingSchema.index({ passenger: 1, status: 1, createdAt: -1 });
 bookingSchema.index({ trip: 1, status: 1 });
 bookingSchema.index({ driver: 1, status: 1 });
 bookingSchema.index({ bookingNumber: 1 });
 
-// Generate unique booking number before saving
 bookingSchema.pre('save', async function(next) {
   if (this.isNew && !this.bookingNumber) {
     const timestamp = Date.now().toString(36);
@@ -164,37 +153,33 @@ bookingSchema.pre('save', async function(next) {
   next();
 });
 
-// Generate confirmation code
 bookingSchema.methods.generateConfirmationCode = function() {
   const code = Math.random().toString(36).substring(2, 8).toUpperCase();
   this.confirmationCode = code;
   return code;
 };
 
-// Check if booking can be cancelled
 bookingSchema.methods.canBeCancelled = function() {
   if (this.status === 'completed' || this.status === 'cancelled') {
     return false;
   }
   
-  // Add any time-based logic here
   return true;
 };
 
-// Calculate refund amount based on cancellation policy
-bookingSchema.methods.calculateRefund = function(trip) {
+bookingSchema.methods.calculateRefund = function(trip: any) {
   if (this.status !== 'confirmed' && this.status !== 'pending') {
     return 0;
   }
   
   const now = new Date();
   const departureTime = new Date(trip.departureTime);
-  const hoursUntilDeparture = (departureTime - now) / (1000 * 60 * 60);
+  const hoursUntilDeparture = (departureTime.getTime() - now.getTime()) / (1000 * 60 * 60);
   
   let refundPercentage = 0;
   
   if (hoursUntilDeparture > 24) {
-    refundPercentage = 100; // Full refund
+    refundPercentage = 100;
   } else if (hoursUntilDeparture > 12) {
     refundPercentage = 75;
   } else if (hoursUntilDeparture > 6) {
@@ -202,9 +187,8 @@ bookingSchema.methods.calculateRefund = function(trip) {
   } else if (hoursUntilDeparture > 2) {
     refundPercentage = 25;
   }
-  // No refund if less than 2 hours
   
   return (this.finalAmount * refundPercentage) / 100;
 };
 
-module.exports = mongoose.model('Booking', bookingSchema);
+export default mongoose.model<IBooking>('Booking', bookingSchema);

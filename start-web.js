@@ -10,9 +10,10 @@ const env = {
   WDS_SOCKET_HOST: '0.0.0.0',
   WDS_SOCKET_PORT: '5000',
   EXPO_USE_STATIC: 'enabled',
+  CI: '1',
 };
 
-const expo = spawn('npx', ['expo', 'start', '--web', '--port', '5000'], {
+const expo = spawn('npx', ['--yes', 'expo@54.0.20', 'start', '--web', '--port', '5000'], {
   env,
   stdio: 'inherit',
   shell: true,

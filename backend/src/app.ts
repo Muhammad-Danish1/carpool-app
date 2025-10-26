@@ -7,6 +7,13 @@ import cookieParser from 'cookie-parser';
 import compression from 'compression';
 import morgan from 'morgan';
 import authRoutes from './routes/auth.routes';
+import tripRoutes from './routes/trip.routes';
+import bookingRoutes from './routes/booking.routes';
+import chatRoutes from './routes/chat.routes';
+import notificationRoutes from './routes/notification.routes';
+import ratingRoutes from './routes/rating.routes';
+import userRoutes from './routes/user.routes';
+import walletRoutes from './routes/wallet.routes';
 import { errorHandler, notFound } from './middleware/error.middleware';
 import logger from './utils/logger';
 import env from './config/env';
@@ -61,6 +68,13 @@ app.get('/health', (_req, res) => {
 });
 
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/trips', tripRoutes);
+app.use('/api/v1/bookings', bookingRoutes);
+app.use('/api/v1/conversations', chatRoutes);
+app.use('/api/v1/notifications', notificationRoutes);
+app.use('/api/v1/ratings', ratingRoutes);
+app.use('/api/v1/users', userRoutes);
+app.use('/api/v1/wallet', walletRoutes);
 
 app.use(notFound);
 
