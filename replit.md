@@ -14,12 +14,14 @@ EasyROAD is a React Native carpooling mobile application built with Expo, featur
 - **Navigation**: React Navigation with bottom tabs
 - **Language**: TypeScript
 - **State Management**: AsyncStorage for local data persistence
+- **Real-time Communication**: Socket.io client for real-time chat and notifications
 
 ### Backend
 - **Framework**: Express.js with TypeScript
 - **Database**: MongoDB with Mongoose ODM
 - **Authentication**: JWT (JSON Web Tokens) with access and refresh tokens
-- **Security**: Helmet, CORS, express-mongo-sanitize, rate limiting
+- **Real-time**: Socket.io server with JWT authentication
+- **Security**: Helmet, CORS, express-mongo-sanitize, rate limiting, Socket.io room authorization
 - **Validation**: express-validator with custom validators
 - **Logging**: Winston logger
 - **Development**: ts-node-dev for hot reloading
@@ -207,6 +209,64 @@ CLIENT_URL=http://localhost:5000
 2. **Phone Verification**: Not yet implemented - will be added as post-authentication feature
 3. **Cache Warnings**: Metro bundler cache warnings can be safely ignored
 4. **Shadow Props**: Deprecated shadow* props warning (low priority, doesn't affect functionality)
+
+## Real-time Features
+
+### Socket.io Integration
+The app includes comprehensive real-time features powered by Socket.io:
+
+**Real-time Chat:**
+- Instant message delivery between users
+- Online/offline presence tracking
+- Typing indicators
+- Message read receipts (sent, delivered, read status)
+- Room-based conversations with participant authorization
+- Automatic reconnection with exponential backoff
+
+**Real-time Notifications:**
+- Instant push notifications for bookings, trips, and messages
+- In-app notification system with unread count tracking
+- Mark as read/mark all as read functionality
+
+**Security:**
+- JWT-based Socket.io authentication
+- Room authorization checks to prevent unauthorized access
+- Secure conversation membership verification
+
+**Frontend Hooks:**
+- `useSocket()` - General Socket.io connection management
+- `useChatSocket(conversationId)` - Real-time chat functionality
+- `useNotifications()` - Real-time notification management
+
+**Backend Event Handlers:**
+- Chat events: join_conversation, send_message, typing_start/stop, message_read, user_online/offline
+- Notification events: mark_read, mark_all_read, new notification
+
+## Recent Changes
+
+### 2025-10-26: Real-time Features Implementation
+- **Socket.io Infrastructure**
+  - Set up Socket.io server with HTTP server integration
+  - Implemented JWT-based Socket.io authentication middleware
+  - Created chat event handlers with participant authorization checks
+  - Created notification event handlers
+  - Built frontend Socket.io service and React hooks (useSocket, useChatSocket, useNotifications)
+  - Added platform-aware URL handling for Replit environment
+  
+- **Security Enhancements**
+  - Fixed authorization vulnerability in chat room joins
+  - Added conversation participant verification before allowing room access
+  - Implemented proper error handling for unauthorized access attempts
+  - Fixed duplicate MongoDB index warnings in booking and payment models
+  
+- **API Enhancements**
+  - Extended API service with chat endpoints (conversations, messages, mark as read)
+  - Extended API service with notification endpoints
+  - Created centralized auth header management function
+  
+- **Code Quality**
+  - Reviewed backend code for TypeScript correctness
+  - All workflows running successfully with Socket.io enabled
 
 ## Recent Changes
 

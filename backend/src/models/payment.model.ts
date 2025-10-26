@@ -88,7 +88,6 @@ const paymentSchema = new Schema<IPayment>({
 
 paymentSchema.index({ user: 1, status: 1, createdAt: -1 });
 paymentSchema.index({ booking: 1 });
-paymentSchema.index({ transactionId: 1 });
 paymentSchema.index({ status: 1, createdAt: -1 });
 
 paymentSchema.pre('save', async function(next) {

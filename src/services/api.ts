@@ -1,4 +1,5 @@
 import { Platform } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const getApiUrl = () => {
   if (Platform.OS === 'web') {
@@ -33,6 +34,113 @@ interface AuthResponse {
   };
   message: string;
 }
+
+const createAuthHeader = async () => {
+  const token = await AsyncStorage.getItem('accessToken');
+  return {
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json',
+  };
+};
+
+export const chatAPI = {
+  getConversations: async () => {
+    const headers = await createAuthHeader();
+    const response = await fetch(`${API_BASE_URL}/conversations`, {
+      headers,
+      credentials: 'include',
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || 'Failed to fetch conversations');
+    return result.data;
+  },
+
+  getOrCreateConversation: async (userId: string) => {
+    const headers = await createAuthHeader();
+    const response = await fetch(`${API_BASE_URL}/conversations`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ userId }),
+      credentials: 'include',
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || 'Failed to get conversation');
+    return result.data;
+  },
+
+  getMessages: async (conversationId: string, page: number = 1, limit: number = 50) => {
+    const headers = await createAuthHeader();
+    const response = await fetch(`${API_BASE_URL}/conversations/${conversationId}/messages?page=${page}&limit=${limit}`, {
+      headers,
+      credentials: 'include',
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || 'Failed to fetch messages');
+    return result.data;
+  },
+
+  sendMessage: async (conversationId: string, content: string, messageType: string = 'text') => {
+    const headers = await createAuthHeader();
+    const response = await fetch(`${API_BASE_URL}/conversations/${conversationId}/messages`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ content, messageType }),
+      credentials: 'include',
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || 'Failed to send message');
+    return result.data;
+  },
+
+  markAsRead: async (conversationId: string) => {
+    const headers = await createAuthHeader();
+    const response = await fetch(`${API_BASE_URL}/conversations/${conversationId}/read`, {
+      method: 'PATCH',
+      headers,
+      credentials: 'include',
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || 'Failed to mark as read');
+    return result.data;
+  },
+};
+
+export const notificationAPI = {
+  getNotifications: async (page: number = 1, limit: number = 50) => {
+    const headers = await createAuthHeader();
+    const response = await fetch(`${API_BASE_URL}/notifications?page=${page}&limit=${limit}`, {
+      headers,
+      credentials: 'include',
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || 'Failed to fetch notifications');
+    return result.data;
+  },
+
+  markAsRead: async (notificationId: string) => {
+    const headers = await createAuthHeader();
+    const response = await fetch(`${API_BASE_URL}/notifications/${notificationId}/read`, {
+      method: 'PATCH',
+      headers,
+      credentials: 'include',
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || 'Failed to mark notification as read');
+    return result.data;
+  },
+
+  markAllAsRead: async () => {
+    const headers = await createAuthHeader();
+    const response = await fetch(`${API_BASE_URL}/notifications/read-all`, {
+      method: 'PATCH',
+      headers,
+      credentials: 'include',
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || 'Failed to mark all as read');
+    return result.data;
+  },
+};
 
 export const authAPI = {
   signup: async (data: SignupData): Promise<AuthResponse> => {

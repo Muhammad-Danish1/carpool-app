@@ -142,7 +142,6 @@ const bookingSchema = new Schema<IBooking>({
 bookingSchema.index({ passenger: 1, status: 1, createdAt: -1 });
 bookingSchema.index({ trip: 1, status: 1 });
 bookingSchema.index({ driver: 1, status: 1 });
-bookingSchema.index({ bookingNumber: 1 });
 
 bookingSchema.pre('save', async function(next) {
   if (this.isNew && !this.bookingNumber) {

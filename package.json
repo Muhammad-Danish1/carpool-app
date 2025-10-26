@@ -65,6 +65,7 @@
     "react-native-web": "~0.21.0",
     "react-native-worklets": "^0.5.1",
     "rn-swipe-button": "^3.0.1",
+    "socket.io-client": "^4.8.1",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "winston": "^3.18.3"
