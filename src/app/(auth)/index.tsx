@@ -60,55 +60,11 @@ const countryCodes = [
 ];
 
 const SignInScreen = () => {
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [selectedCountry, setSelectedCountry] = useState(countryCodes[4]);
-  const handleGetCode = () => {
-    // TODO: Implement phone number verification logic
-    router.push("/NumberVerfication");
-  };
+  React.useEffect(() => {
+    router.replace("/(auth)/signin");
+  }, []);
 
-  return (
-    <SafeAreaWrapper
-      backgroundColor="white"
-      statusBarStyle="dark-content"
-      keyboardAvoidingView={true}
-    >
-      <View style={styles.contentContainer}>
-        <Text style={styles.titleText}>Sign In</Text>
-        <Text style={styles.subtitleText}>
-          Enter your phone number to access your EasyRoad account
-        </Text>
-
-        <CustomInput
-          leftComponent={
-            <TouchableOpacity
-              style={styles.flagContainer}
-              onPress={() => setSelectedCountry(countryCodes[4])}
-            >
-              <Text style={styles.flagText}>{selectedCountry.flag}</Text>
-              <Entypo name="chevron-down" size={20} color="gray" />
-            </TouchableOpacity>
-          }
-          placeholder={`${selectedCountry.code} (000) 000-00-00`}
-          keyboardType="phone-pad"
-          value={phoneNumber}
-          onChangeText={setPhoneNumber}
-          containerStyle={styles.inputContainer}
-        />
-
-        <SwipeCustomButton
-          title="Get Code"
-          onPress={handleGetCode}
-          disabled={phoneNumber.length !== 10}
-        />
-
-        <Text style={styles.termsText}>
-          By clicking the &quot;Get Code&quot; button, you accept the terms of
-          <Text style={styles.linkText}> privacy policy</Text>
-        </Text>
-      </View>
-    </SafeAreaWrapper>
-  );
+  return null;
 };
 
 const styles = StyleSheet.create({
